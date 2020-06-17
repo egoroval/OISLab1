@@ -4,8 +4,8 @@ namespace OISLab1
 {
     internal class Domain
     {
-        private string TypeAp{ get; }
-        public Domain(string typeAP)
+        public AccessPoint TypeAp{ get; }
+        public Domain(AccessPoint typeAP)
         {
             TypeAp = typeAP;
 
@@ -14,14 +14,5 @@ namespace OISLab1
         }
         public List<Block> InBlock { get; }
         public List<Block> OutBlock {get;}
-
-        public bool EqualsDomain(Domain domain)
-        {
-            return EqualsDomain(domain.TypeAp);
-        }
-        public bool EqualsDomain(string typeAp)
-        {
-            return TypeAp == typeAp;
-        }
     }
 }

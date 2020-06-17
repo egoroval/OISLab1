@@ -4,6 +4,9 @@ namespace OISLab1
     {
         public AccessPoint[] InAccessPoints { get; }
         public AccessPoint[] OutAccessPoints { get; }
+
+        public Domain OutDomain {get; set;}
+
         public Block(AccessPoint[] inAccessPoints, AccessPoint[] outAccessPoints)
         {
             InAccessPoints = inAccessPoints;

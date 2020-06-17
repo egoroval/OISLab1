@@ -20,36 +20,42 @@ namespace OISLab1
         
         public virtual bool EqualsAP(AccessPoint ap)
         {
-            var listAp = ap.Include.ToList();
-
-            foreach(var accessPoint in Include)
+            if(TypeStr == ap.TypeStr)
             {
-                var tmp = listAp.FirstOrDefault(a => a.EqualsAP(accessPoint));
-                if(tmp == null)
-                    return false;
-                listAp.Remove(tmp);
+                if(TypeStr == "array")
+                {
+                    var listAp = ap.Include.ToArray();
+                    foreach(var accessPoint in Include)
+                    {
+                        var tmp = listAp.FirstOrDefault(a => a.EqualsAP(accessPoint));
+                        if(tmp == null)
+                        return false;
+                    }
+                }
+                return true;
             }
 
-            return true;
+
+            return false;
         }
     }
     internal class AccessPointInt : AccessPoint
     {
-        public AccessPointInt() : base("int")
+        public AccessPointInt() : base("int", null)
         {
         }
     }
 
     internal class AccessPointString : AccessPoint
     {
-        public AccessPointString() : base("string")
+        public AccessPointString() : base("string", null)
         {
         }
     }
 
     internal class AccessPointBool : AccessPoint
     {
-        public AccessPointBool() : base("bool")
+        public AccessPointBool() : base("bool", null)
         {
         }
     }
