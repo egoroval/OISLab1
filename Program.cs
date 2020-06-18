@@ -37,7 +37,10 @@ namespace OISLab1
                         Load(command[1], listDomains, listBlocks);
                         break;
                     case "print":
-                        Print(listDomains, listBlocks);
+                        if (command.Length > 1)
+                            Print(listDomains, listBlocks, command[1]);
+                        else
+                            Print(listDomains, listBlocks);
                         break;
                     case "show":
                         int index;
@@ -48,12 +51,12 @@ namespace OISLab1
                         }
                         Console.WriteLine($"Block: {index}");
                         Console.WriteLine("in access points:");
-                        foreach(var ap in listBlocks[index].InAccessPoints)
+                        foreach (var ap in listBlocks[index].InAccessPoints)
                         {
                             Console.WriteLine(ap.TypeStr);
                         }
                         Console.WriteLine("out access points:");
-                        foreach(var ap in listBlocks[index].OutAccessPoints)
+                        foreach (var ap in listBlocks[index].OutAccessPoints)
                         {
                             Console.WriteLine(ap.TypeStr);
                         }
@@ -68,30 +71,75 @@ namespace OISLab1
                 }
             }
         }
+
+        static void Print(List<Domain> domains, List<Block> blocks, string path)
+        {
+            using (var writer = new StreamWriter(path, false))
+            {
+                foreach (var block in blocks)
+                {
+                    foreach (var list in GetChain(new List<Block> { block }))
+                    {
+                        writer.WriteLine();
+                        foreach (var b in list)
+                        {
+                            writer.Write($" -{blocks.IndexOf(b)}- ");
+                        }
+                    }
+                }
+            }
+        }
         static void Print(List<Domain> domains, List<Block> blocks)
         {
-            foreach(var block in blocks)
+            foreach (var block in blocks)
             {
-                foreach(var str in GetChain(block.OutDomain, block, blocks))
-                    Console.WriteLine(str);
-            }          
+                foreach (var list in GetChain(new List<Block> { block }))
+                {
+                    Console.WriteLine();
+                    foreach (var b in list)
+                    {
+                        Console.Write($" -{blocks.IndexOf(b)}- ");
+                    }
+                }
+            }
         }
-        static string[] GetChain(Domain domain, Block block, List<Block> blocks)
+        static List<List<Block>> GetChain(List<Block> blocks)
         {
-            var res = new List<string>();
-            res.Add(blocks.IndexOf(block).ToString());
-            // foreach(var inBlock in domain.InBlock)
+            var list = new List<List<Block>>();
+            list.Add(blocks.ToList());
+            foreach (var inBlock in blocks.Last().OutDomain.InBlock.Where(b => blocks.All(b2 => b2.OutDomain != b.OutDomain)))
+            {
+                var tmp = blocks.ToList();
+                tmp.Add(inBlock);
+                list.AddRange(GetChain(tmp));
+            }
+            return list;
+
+            // var res = new List<string>();
+            // res.Add(blocks.IndexOf(block).ToString());
+            // foreach (var inBlock in domain.InBlock)
             // {
+            //     if (inBlock == block)
+            //         continue;
             //     var str = blocks.IndexOf(block).ToString() + " - " + blocks.IndexOf(inBlock).ToString();
             //     var array = GetChain(inBlock.OutDomain, inBlock, blocks);
             //     res.Add(str);
-            //     foreach(var b in array)
+            //     foreach (var b in array)
             //     {
             //         res.Add(str + " - " + b);
             //     }
             // }
 
-            return res.ToArray();
+            // foreach(var inBlock in block.OutDomain.InBlock)
+            // {
+            //     queue.Append(block);
+            //     if(block == inBlock)
+            //         return queue;
+            //     if(block.InAccessPoints.Any(b => b.EqualsAP(block.OutDomain.TypeAp)))
+            //         return queue;
+            // }
+
+            // return res.ToArray();
         }
         static void Load(string path, List<Domain> domains, List<Block> blocks)
         {
@@ -118,22 +166,22 @@ namespace OISLab1
                     }
                 }
             }
-            foreach(var block in blocks)
+            foreach (var block in blocks)
             {
-                foreach(var ap in block.InAccessPoints)
+                foreach (var ap in block.InAccessPoints)
                 {
                     var domain = domains.FirstOrDefault(d => d.TypeAp.EqualsAP(ap));
-                    if(domain == null)
+                    if (domain == null)
                     {
                         domain = new Domain(ap);
                         domains.Add(domain);
                     }
                     domain.InBlock.Add(block);
                 }
-                foreach(var ap in block.OutAccessPoints)
+                foreach (var ap in block.OutAccessPoints)
                 {
                     var domain = domains.FirstOrDefault(d => d.TypeAp.EqualsAP(ap));
-                    if(domain == null)
+                    if (domain == null)
                     {
                         domain = new Domain(ap);
                         domains.Add(domain);
